@@ -1,0 +1,39 @@
+import pandas as pd
+from sklearn.model_selection import train_test_split
+from sklearn.feature_extraction.text import CountVectorizer
+from sklearn.naive_bayes import MultinomialNB
+from sklearn.pipeline import Pipeline
+
+# Load the dataset (replace 'spam_data.csv' with your dataset file)
+# Assuming the dataset has columns 'Category' (spam or ham) and 'Message' (text)
+data = pd.read_csv('spam_data.csv')
+
+# 1. Pre-process the dataset
+# Create a new column 'Spam' where spam = 1 and ham = 0
+data['Spam'] = data['Category'].apply(lambda x: 1 if x.lower() == 'spam' else 0)
+
+# Split the data into training and testing sets
+X_train, X_test, y_train, y_test = train_test_split(data['Message'], data['Spam'], test_size=0.25, random_state=42)
+
+# 2. Build a pipeline with CountVectorizer and MultinomialNB
+clf = Pipeline([
+    ('vectorizer', CountVectorizer()),
+    ('nb', MultinomialNB())
+])
+
+# Train the model
+clf.fit(X_train, y_train)
+
+# Example test messages for prediction
+emails = [
+    'Sounds great! Are you home now?',
+    'Will u meet ur dream partner soon? Is ur career off 2 a flyng start? 2 find out free, txt HORO followed by ur star sign, e.g., HORO ARIES'
+]
+
+# Predict spam/ham for example emails
+predictions = clf.predict(emails)
+print("Predictions for example emails:", predictions)
+
+# Evaluate the model on the test set
+score = clf.score(X_test, y_test)
+print("Model Accuracy:", score)
